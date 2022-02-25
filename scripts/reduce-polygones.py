@@ -35,21 +35,32 @@ def importFiles(ruta):
 
         # Agregamos el modificador decimal
         for object in bpy.data.objects:
-            if object.type == "MESH" and not object.name.startswith("Camera") and not object.name.startswith("Cube") and not object.name.startswith("Lig"):
+            if object.type == "MESH":
+                # if number of faces is less than 1000
+                number_of_faces = len(object.data.polygons)
+                ratio = 0.7
+                if number_of_faces > 15:
+
+                    if number_of_faces > 5000:
+                        ratio = 0.3
+                    
                 
-                print("Aplicamos el modificador decimate a: "+object.name)
-                bpy.context.view_layer.objects.active = object
-                bpy.ops.object.modifier_add(type='DECIMATE')
+                    print("Aplicamos el modificador decimate a: "+object.name)
+                    bpy.context.view_layer.objects.active = object
+                    bpy.ops.object.modifier_add(type='DECIMATE')
 
-                bpy.context.object.modifiers["Decimate"].decimate_type = 'COLLAPSE'
-                bpy.context.object.modifiers["Decimate"].ratio = 0.3
-                bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
-                bpy.context.object.modifiers["Decimate"].use_symmetry = True
-                bpy.context.object.modifiers["Decimate"].use_dissolve_boundaries = True
+                    bpy.context.object.modifiers["Decimate"].decimate_type = 'COLLAPSE'
+                    bpy.context.object.modifiers["Decimate"].ratio = ratio
+                    bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
+                    bpy.context.object.modifiers["Decimate"].use_symmetry = True
+                    bpy.context.object.modifiers["Decimate"].use_dissolve_boundaries = True
 
 
-                # Aplicamos el modificador al objeto
-                bpy.ops.object.modifier_apply( modifier = 'Decimate' )
+                    # Aplicamos el modificador al objeto
+                    bpy.ops.object.modifier_apply( modifier = 'Decimate' )
+
+                    # apply shade smooth
+                    bpy.ops.object.shade_smooth()
 
         nombre_archivo = os.path.basename(file)
         # path_file_blend = os.path.splitext(nombre_archivo)[0] + ".blend"
