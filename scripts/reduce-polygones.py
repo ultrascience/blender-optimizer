@@ -2,7 +2,7 @@
 import os
 import bpy
 
-"""Find all files with termination
+"""Find all files with termination .glb in the current directory
     and returns it without termination
     :param path to directory
 """
@@ -10,15 +10,16 @@ def findFiles(path):
     resultado = []
     for root, dirs, files in os.walk(path):
         for file in files:
-            if file.endswith(".fbx"):
+            if file.endswith(".dae"):
                 print(os.path.join(root,file))
                 resultado.append(os.path.join(root,file))
     return resultado
+
 """
 Funcion que importa los archivos y le aplica el modificador decimate
 """
-def importFiles():        
-    blenderFiles=findFiles('/home/aldo/modelos_raw')
+def importFiles(ruta):
+    blenderFiles=findFiles(ruta)
 
     current_directory = os.getcwd()
     current_directory = os.path.join(current_directory, "modelosGLB")
@@ -28,7 +29,8 @@ def importFiles():
 
         # Limpiamos los data blocks de blender
         bpy.ops.wm.read_factory_settings(use_empty=True)
-        bpy.ops.import_scene.fbx(filepath=file)
+        # bpy.ops.import_scene.gltf(filepath=file)
+        bpy.ops.wm.collada_import(filepath=file)
         print("Importando archivo: "+file)
 
         # Agregamos el modificador decimal
@@ -39,8 +41,12 @@ def importFiles():
                 bpy.context.view_layer.objects.active = object
                 bpy.ops.object.modifier_add(type='DECIMATE')
 
+                bpy.context.object.modifiers["Decimate"].decimate_type = 'COLLAPSE'
+                bpy.context.object.modifiers["Decimate"].ratio = 0.3
                 bpy.context.object.modifiers["Decimate"].use_collapse_triangulate = True
-                bpy.context.object.modifiers["Decimate"].ratio=0.1
+                bpy.context.object.modifiers["Decimate"].use_symmetry = True
+                bpy.context.object.modifiers["Decimate"].use_dissolve_boundaries = True
+
 
                 # Aplicamos el modificador al objeto
                 bpy.ops.object.modifier_apply( modifier = 'Decimate' )
@@ -57,7 +63,8 @@ def importFiles():
         bpy.ops.export_scene.gltf(filepath = path_directorio, use_selection = False)
 
 def main():
-    importFiles()
+    cwd = os.getcwd()
+    importFiles(cwd)
 
 if __name__ == '__main__':
     main()
