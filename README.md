@@ -1,2 +1,1 @@
-# Ejemplos de scripts de uso de la API de Blender
-
+## Optimizador de modelos 3D
